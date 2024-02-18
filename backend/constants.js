@@ -1,4 +1,4 @@
-const SERVER_URL = 'https://a2f8-103-41-32-219.ngrok-free.app';
+const SERVER_URL = 'https://its-frames.onrender.com';
 
 const S3_URL =
   'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames';
