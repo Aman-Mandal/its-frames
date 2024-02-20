@@ -10,22 +10,25 @@ import {
 } from '@/utils/viemConfig';
 import { ABI, CHAINS } from '@/utils/constants';
 import { parseUnits } from 'viem';
-
+import Modal from '@/components/Modal';
 
 const Home = () => {
   const [fetchedData, setFetchedData] = useState({});
   const [decimals, setDecimals] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const { address } = useAccount();
   const { chain } = useNetwork();
   const { open } = useWeb3Modal();
 
   const connectWalletHandler = async () => {
+    setLoading(true);
     await open();
+    setLoading(false);
   };
 
   const fetchData = async () => {
-    const res = await fetch('http://localhost:8080/confirm');
+    const res = await fetch('https://its-frames.onrender.com/confirm');
     const data = await res.json();
 
     console.log('DATA', data);
@@ -42,6 +45,7 @@ const Home = () => {
         args: [],
         chainId: chain,
         functionName: 'decimals',
+        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain].rpcUrl,
       });
 
       setDecimals(decimal);
@@ -52,6 +56,7 @@ const Home = () => {
 
   const interchainTransferHandler = async () => {
     try {
+      setLoading(true);
       const res = await writeContractFunction({
         abi: ABI,
         account: address,
@@ -66,8 +71,10 @@ const Home = () => {
         chainId: CHAINS[fetchedData.primaryChain],
         functionName: 'interchainTransfer',
       });
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -77,14 +84,35 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      <button onClick={connectWalletHandler}>
-        {address ? 'Connected' : 'Connect'}
-      </button>
-      <p>{address ? address : ''}</p>
+    // <div>
+    //   <button onClick={connectWalletHandler}>
+    //     {address ? 'Connected' : 'Connect'}
+    //   </button>
+    //   <p>{address ? address : ''}</p>
 
-      <button onClick={interchainTransferHandler}>Transfer</button>
-    </div>
+    //   <button onClick={interchainTransferHandler}>Transfer</button>
+
+    //   <Modal />
+    // </div>
+
+    <main className='flex flex-col items-center min-h-screen pt-32 bg-[url("/bg.png")] font-Avenir '>
+      <div className='flex mb-5 gap-2 w-[550px]'>
+        <p
+          className={
+            'bg-purple-700  text-white   py-1 px-6 text-sm rounded-md cursor-pointer'
+          }>
+          Interchain Token Service
+        </p>
+      </div>
+
+      <Modal
+        loading={loading}
+        fetchedData={fetchedData}
+        decimal={decimals}
+        transferHandler={interchainTransferHandler}
+        connectWalletHandler={connectWalletHandler}
+      />
+    </main>
   );
 };
 

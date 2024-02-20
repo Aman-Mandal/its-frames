@@ -9,10 +9,10 @@ const CHAIN_CONFIG = {
   1: mainnet,
 };
 
-const getPublicClient = (chainId) => {
+const getPublicClient = (chainId, rpcUrl) => {
   const client = createPublicClient({
     chain: CHAIN_CONFIG[chainId],
-    transport: custom(window.ethereum),
+    transport: http(rpcUrl),
   });
 
   return client;
@@ -70,8 +70,9 @@ export const readContractFunction = async ({
   args,
   account,
   chainId,
+  rpcUrl,
 }) => {
-  const publicClient = getPublicClient(chainId);
+  const publicClient = getPublicClient(chainId, rpcUrl);
 
   const data = await publicClient.readContract({
     address,
