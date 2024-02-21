@@ -1,4 +1,4 @@
-const SERVER_URL = 'https://its-frames.onrender.com/';
+const SERVER_URL = 'https://its-frames.onrender.com';
 
 const S3_URL =
   'https://clubprofilepics.s3.ap-south-1.amazonaws.com/stnx_frames';
