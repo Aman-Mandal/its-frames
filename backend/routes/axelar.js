@@ -14,14 +14,14 @@ router.get('/health', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
   res
     .status(200)
     .setHeader('Content-Type', 'text/html')
     .send(RESPONSE_TYPE.ZERO_PAGE);
 });
 
-router.get('/start', async (req, res) => {
+router.post('/start', async (req, res) => {
   res
     .status(200)
     .setHeader('Content-Type', 'text/html')
