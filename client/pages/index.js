@@ -8,9 +8,10 @@ import {
   readContractFunction,
   writeContractFunction,
 } from '@/utils/viemConfig';
-import { ABI, CHAINS } from '@/utils/constants';
-import { parseUnits } from 'viem';
+import { ABI, CHAINS, CHAIN_CONFIG } from '@/utils/constants';
+import { parseEther, parseUnits } from 'viem';
 import Modal from '@/components/Modal';
+import { formatEther } from 'ethers';
 
 const Home = () => {
   const [fetchedData, setFetchedData] = useState({});
@@ -31,7 +32,6 @@ const Home = () => {
     const res = await fetch('https://its-frames.onrender.com/confirm');
     const data = await res.json();
 
-    console.log('DATA', data);
     setFetchedData(data);
   };
 
@@ -40,10 +40,9 @@ const Home = () => {
       const decimal = await readContractFunction({
         abi: ABI,
         account: address,
-        // address: fetchedData.tokenAddress,
-        address: '0x4eb9fa479Ade63317e95f605e26d1369E6225031',
+        address: fetchedData.tokenAddress,
         args: [],
-        chainId: chain,
+        chainId: chain.id,
         functionName: 'decimals',
         rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain].rpcUrl,
       });
@@ -60,8 +59,7 @@ const Home = () => {
       const res = await writeContractFunction({
         abi: ABI,
         account: address,
-        // address: fetchedData.tokenAddress,
-        address: '0x4eb9fa479Ade63317e95f605e26d1369E6225031',
+        address: fetchedData?.tokenAddress,
         args: [
           fetchedData.secondaryChain,
           fetchedData.recieverAddress,
@@ -70,6 +68,8 @@ const Home = () => {
         ],
         chainId: CHAINS[fetchedData.primaryChain],
         functionName: 'interchainTransfer',
+        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain]?.rpcUrl,
+        value: parseEther(CHAIN_CONFIG[fetchedData?.primaryChain]?.value),
       });
       setLoading(false);
     } catch (error) {
@@ -81,20 +81,9 @@ const Home = () => {
   useEffect(() => {
     fetchData();
     fetchDecimals();
-  }, []);
+  }, [fetchedData?.primaryChain, address]);
 
   return (
-    // <div>
-    //   <button onClick={connectWalletHandler}>
-    //     {address ? 'Connected' : 'Connect'}
-    //   </button>
-    //   <p>{address ? address : ''}</p>
-
-    //   <button onClick={interchainTransferHandler}>Transfer</button>
-
-    //   <Modal />
-    // </div>
-
     <main className='flex flex-col items-center min-h-screen pt-32 bg-[url("/bg.png")] font-Avenir '>
       <div className='flex mb-5 gap-2 w-[550px]'>
         <p
@@ -111,6 +100,7 @@ const Home = () => {
         decimal={decimals}
         transferHandler={interchainTransferHandler}
         connectWalletHandler={connectWalletHandler}
+        setLoading={setLoading}
       />
     </main>
   );

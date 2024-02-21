@@ -62,11 +62,11 @@ router.post('/primaryChains', async (req, res) => {
       req.body.untrustedData.buttonIndex === 1
         ? 'Polygon'
         : req.body.untrustedData.buttonIndex === 2
-        ? 'Base'
+        ? 'base'
         : req.body.untrustedData.buttonIndex === 3
         ? 'Ethereum'
         : req.body.untrustedData.buttonIndex === 4
-        ? 'BNB'
+        ? 'binance'
         : null;
 
     res
@@ -123,11 +123,11 @@ router.post('/secondaryChain', async (req, res) => {
       req.body.untrustedData.buttonIndex === 1
         ? 'Polygon'
         : req.body.untrustedData.buttonIndex === 2
-        ? 'Base'
+        ? 'base'
         : req.body.untrustedData.buttonIndex === 3
         ? 'Ethereum'
         : req.body.untrustedData.buttonIndex === 4
-        ? 'BNB'
+        ? 'binance'
         : null;
 
     res
@@ -156,8 +156,6 @@ router.post('/reciever', async (req, res) => {
 
     dataObj.recieverAddress = req.body.untrustedData.inputText;
 
-    console.log('OBJECT', dataObj);
-
     res
       .status(200)
       .setHeader('Content-Type', 'text/html')
@@ -170,6 +168,12 @@ router.post('/reciever', async (req, res) => {
       .send(RESPONSE_TYPE.TRY_AGAIN_LATER);
   }
 });
+
+// router.get('/confirm', async (req, res) => {
+//   const queryParams = new URLSearchParams(dataObj).toString();
+//   const redirectUrl = `http://localhost:3000/${queryParams}`;
+//   res.redirect(redirectUrl);
+// });
 
 router.get('/confirm', async (req, res) => {
   res.json(dataObj);

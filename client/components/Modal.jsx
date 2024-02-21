@@ -6,6 +6,8 @@ import { useAccount, useNetwork } from 'wagmi';
 import Loader from './Loader';
 import { readContractFunction } from '@/utils/viemConfig';
 import { ABI, CHAIN_CONFIG } from '@/utils/constants';
+import { switchNetworkHandler } from '@/utils/helper';
+import { parseUnits } from 'viem';
 
 const Modal = ({
   fetchedData,
@@ -13,12 +15,13 @@ const Modal = ({
   transferHandler,
   connectWalletHandler,
   loading,
+  setLoading,
 }) => {
   const { address } = useAccount();
   const { chain } = useNetwork();
 
   const [tokenName, setTokenName] = useState('');
-  const [userBalance, setUserBalance] = useState(0);
+  const [isEnoughBalance, setIsEnoughBalance] = useState(false);
 
   const fetchTokenName = async () => {
     try {
@@ -45,22 +48,25 @@ const Modal = ({
         abi: ABI,
         account: address,
         args: [address],
-        chainId: chain,
+        chainId: chain.id,
         functionName: 'balanceOf',
         rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain].rpcUrl,
         address: fetchedData.tokenAddress,
       });
 
-      setUserBalance(balance);
+      const isEnough = balance > parseUnits(fetchedData.amount, decimal);
+      setIsEnoughBalance(isEnough);
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    fetchTokenName();
-    fetchBalance();
-  }, [address, fetchedData?.primaryChain]);
+    if (fetchedData?.primaryChain) {
+      fetchTokenName();
+      fetchBalance();
+    }
+  }, [address, fetchedData?.primaryChain, chain, fetchedData?.tokenAddress]);
 
   return (
     <div>
@@ -71,7 +77,7 @@ const Modal = ({
               disabled
               placeholder='0.0'
               autoFocus
-              className='text-3xl  bg-inherit focus:outline-none outline-none '
+              className='text-3xl  bg-inherit focus:outline-none outline-none cursor-not-allowed'
               type='number'
               value={fetchedData?.amount}
             />
@@ -80,9 +86,6 @@ const Modal = ({
               <p className='py-3 px-3 text-black font-semibold bg-purple-300 text-center rounded-lg mb-3'>
                 {tokenName}
               </p>
-              {/* <p className='text-gray-400'>
-                Balance: <span>{userBalance ? userBalance : 0}</span>
-              </p> */}
             </div>
           </div>
         </div>
@@ -91,7 +94,9 @@ const Modal = ({
           <p className='text-gray-400 mb-1'>Reciever</p>
 
           <div className='flex justify-between items-center'>
-            <p className='font-semibold'>{fetchedData.recieverAddress}</p>
+            <p className='font-semibold cursor-not-allowed'>
+              {fetchedData.recieverAddress}
+            </p>
             <BiSolidCopy
               className='cursor-pointer'
               size={20}
@@ -101,7 +106,7 @@ const Modal = ({
 
         <div className='flex justify-between items-center gap-2 font-Avenir'>
           <div className='bg-[#000000] py-8 px-6 rounded-xl mt-2 w-full'>
-            <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md'>
+            <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md cursor-not-allowed'>
               <Image
                 src={CHAIN_CONFIG[fetchedData?.primaryChain]?.img}
                 height={30}
@@ -121,7 +126,7 @@ const Modal = ({
           />
 
           <div className='bg-[#000000] py-8 px-6 rounded-xl mt-2 w-full'>
-            <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md'>
+            <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md cursor-not-allowed'>
               <Image
                 src={CHAIN_CONFIG[fetchedData?.secondaryChain]?.img}
                 height={30}
@@ -136,12 +141,36 @@ const Modal = ({
           </div>
         </div>
 
-        {address ? (
+        {address &&
+        chain.id !== CHAIN_CONFIG[fetchedData?.primaryChain]?.chainId ? (
           <button
+            onClick={() => {
+              switchNetworkHandler(
+                CHAIN_CONFIG[fetchedData?.primaryChain]?.networkId,
+                setLoading
+              );
+            }}
+            type='button'
+            className='bg-purple-800 w-full mt-3 text-white py-3 font-semibold text-base hover:bg-purple-700 tracking-wider   rounded-2xl '>
+            {loading ? (
+              <Loader inComp={true} />
+            ) : (
+              `Switch to ${CHAIN_CONFIG[fetchedData?.primaryChain]?.name} `
+            )}
+          </button>
+        ) : address ? (
+          <button
+            disabled={!isEnoughBalance}
             onClick={transferHandler}
             type='button'
             className='bg-purple-800 w-full mt-3 text-white py-3 font-semibold text-base hover:bg-purple-700 tracking-wider   rounded-2xl '>
-            {loading ? <Loader inComp={true} /> : 'Transfer'}
+            {loading ? (
+              <Loader inComp={true} />
+            ) : !isEnoughBalance ? (
+              'Insufficient Balance'
+            ) : (
+              'Transfer'
+            )}
           </button>
         ) : (
           <button

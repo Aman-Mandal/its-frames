@@ -6,18 +6,19 @@ export const RPC_URL =
 
 export const CHAINS = {
   Polygon: 137,
-  Base: 8453,
+  base: 8453,
   Ethereum: 1,
-  BNB: 56,
+  binance: 56,
 };
 
 export const CHAIN_CONFIG = {
-  Base: {
+  base: {
     img: '/base.png',
     chainId: 8453,
     networkId: '0x2105',
     name: 'Base Mainnet',
     rpcUrl: `https://proportionate-dry-pine.base-mainnet.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_BASE_API_KEY}/`,
+    value: '0.00001',
   },
   Polygon: {
     img: '/polygon.png',
@@ -25,6 +26,7 @@ export const CHAIN_CONFIG = {
     networkId: '0x89',
     name: 'Polygon Mainnet',
     rpcUrl: `https://polygon-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+    value: '3',
   },
   Ethereum: {
     img: '/eth.png',
@@ -32,12 +34,65 @@ export const CHAIN_CONFIG = {
     networkId: '0x1',
     name: 'Ethereum Mainnet',
     rpcUrl: `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+    value: '0.001',
   },
-  Bnb: {
+  binance: {
     img: '/bnb.png',
     chainId: 56,
     networkId: '0x38',
     name: 'BNB Mainnet',
+    rpcUrl: `https://special-spring-sun.bsc.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_API_KEY}/`,
+    value: '0.009',
+  },
+};
+
+export const CHAIN_CONFIG2 = {
+  '0x2105': {
+    img: '/base.png',
+    chainId: 8453,
+    networkId: '0x2105',
+    name: 'Base Mainnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'ETH ',
+      symbol: 'ETH',
+    },
+    rpcUrl: `https://proportionate-dry-pine.base-mainnet.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_BASE_API_KEY}/`,
+  },
+  '0x89': {
+    img: '/polygon.png',
+    chainId: 137,
+    networkId: '0x89',
+    name: 'Polygon Mainnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'MATIC',
+      symbol: 'MATIC',
+    },
+    rpcUrl: `https://polygon-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+  },
+  '0x1': {
+    img: '/eth.png',
+    chainId: 1,
+    networkId: '0x1',
+    name: 'Ethereum Mainnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'ETH ',
+      symbol: 'ETH',
+    },
+    rpcUrl: `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
+  },
+  '0x38': {
+    img: '/bnb.png',
+    chainId: 56,
+    networkId: '0x38',
+    name: 'BNB Mainnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'BNB ',
+      symbol: 'BNB',
+    },
     rpcUrl: `https://special-spring-sun.bsc.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_API_KEY}/`,
   },
 };

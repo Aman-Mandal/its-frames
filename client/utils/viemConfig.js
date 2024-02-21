@@ -12,7 +12,7 @@ const CHAIN_CONFIG = {
 const getPublicClient = (chainId, rpcUrl) => {
   const client = createPublicClient({
     chain: CHAIN_CONFIG[chainId],
-    transport: http(rpcUrl),
+    transport: http(rpcUrl ?? window?.ethereum),
   });
 
   return client;
@@ -37,9 +37,11 @@ export const writeContractFunction = async ({
   args,
   account,
   chainId,
+  rpcUrl,
+  value
 }) => {
   try {
-    const publicClient = getPublicClient(chainId);
+    const publicClient = getPublicClient(chainId, rpcUrl);
     const walletClient = getWalletClient(chainId);
 
     const { request } = await publicClient.simulateContract({
@@ -48,6 +50,7 @@ export const writeContractFunction = async ({
       functionName,
       args,
       account,
+      value
     });
 
     const txHash = await walletClient.writeContract(request);
