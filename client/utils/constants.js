@@ -18,7 +18,7 @@ export const CHAIN_CONFIG = {
     networkId: '0x2105',
     name: 'Base Mainnet',
     rpcUrl: `https://proportionate-dry-pine.base-mainnet.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_BASE_API_KEY}/`,
-    value: '0.00001',
+    value: '0.0002',
   },
   Polygon: {
     img: '/polygon.png',
@@ -26,7 +26,7 @@ export const CHAIN_CONFIG = {
     networkId: '0x89',
     name: 'Polygon Mainnet',
     rpcUrl: `https://polygon-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
-    value: '3',
+    value: '0.5',
   },
   Ethereum: {
     img: '/eth.png',
@@ -34,7 +34,7 @@ export const CHAIN_CONFIG = {
     networkId: '0x1',
     name: 'Ethereum Mainnet',
     rpcUrl: `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
-    value: '0.001',
+    value: '0.0002',
   },
   binance: {
     img: '/bnb.png',
@@ -42,7 +42,7 @@ export const CHAIN_CONFIG = {
     networkId: '0x38',
     name: 'BNB Mainnet',
     rpcUrl: `https://special-spring-sun.bsc.discover.quiknode.pro/${process.env.NEXT_PUBLIC_QUICKNODE_API_KEY}/`,
-    value: '0.009',
+    value: '0.0015',
   },
 };
 
