@@ -8,6 +8,7 @@ import { readContractFunction } from '@/utils/viemConfig';
 import { ABI, CHAIN_CONFIG } from '@/utils/constants';
 import { switchNetworkHandler } from '@/utils/helper';
 import { parseUnits } from 'viem';
+import { useRouter } from 'next/router';
 
 const Modal = ({
   fetchedData,
@@ -23,17 +24,20 @@ const Modal = ({
   const [tokenName, setTokenName] = useState('');
   const [isEnoughBalance, setIsEnoughBalance] = useState(false);
 
+  const router = useRouter();
+
+  const { token, amount, primary, secondary, receiver } = router.query;
+
   const fetchTokenName = async () => {
     try {
       const name = await readContractFunction({
         abi: ABI,
         account: address,
-        // address: fetchedData.tokenAddress,
-        address: '0x4eb9fa479Ade63317e95f605e26d1369E6225031',
+        address: token,
         args: [],
         chainId: chain,
         functionName: 'symbol',
-        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain]?.rpcUrl,
+        rpcUrl: CHAIN_CONFIG[primary]?.rpcUrl,
       });
 
       setTokenName(name);
@@ -50,11 +54,11 @@ const Modal = ({
         args: [address],
         chainId: chain.id,
         functionName: 'balanceOf',
-        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain].rpcUrl,
-        address: fetchedData.tokenAddress,
+        rpcUrl: CHAIN_CONFIG[primary]?.rpcUrl,
+        address: token,
       });
 
-      const isEnough = balance > parseUnits(fetchedData.amount, decimal);
+      const isEnough = balance > parseUnits(amount, decimal);
       setIsEnoughBalance(isEnough);
     } catch (error) {
       console.log(error);
@@ -62,11 +66,11 @@ const Modal = ({
   };
 
   useEffect(() => {
-    if (fetchedData?.primaryChain) {
+    if (primary && token) {
       fetchTokenName();
       fetchBalance();
     }
-  }, [address, fetchedData?.primaryChain, chain, fetchedData?.tokenAddress]);
+  }, [address, primary, chain, token]);
 
   return (
     <div>
@@ -79,7 +83,7 @@ const Modal = ({
               autoFocus
               className='text-3xl  bg-inherit focus:outline-none outline-none cursor-not-allowed'
               type='number'
-              value={fetchedData?.amount}
+              value={amount}
             />
 
             <div>
@@ -94,9 +98,7 @@ const Modal = ({
           <p className='text-gray-400 mb-1'>Reciever</p>
 
           <div className='flex justify-between items-center'>
-            <p className='font-semibold cursor-not-allowed'>
-              {fetchedData.recieverAddress}
-            </p>
+            <p className='font-semibold cursor-not-allowed'>{receiver}</p>
             <BiSolidCopy
               className='cursor-pointer'
               size={20}
@@ -108,15 +110,13 @@ const Modal = ({
           <div className='bg-[#000000] py-8 px-6 rounded-xl mt-2 w-full'>
             <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md cursor-not-allowed'>
               <Image
-                src={CHAIN_CONFIG[fetchedData?.primaryChain]?.img}
+                src={CHAIN_CONFIG[primary]?.img}
                 height={30}
                 width={30}
                 alt='primary chain'
                 className='rounded-[50px]'
               />
-              <p className=' text-gray-300 '>
-                {CHAIN_CONFIG[fetchedData?.primaryChain]?.name}
-              </p>
+              <p className=' text-gray-300 '>{CHAIN_CONFIG[primary]?.name}</p>
             </div>
           </div>
 
@@ -128,25 +128,22 @@ const Modal = ({
           <div className='bg-[#000000] py-8 px-6 rounded-xl mt-2 w-full'>
             <div className='flex items-center gap-3 bg-[#111111] py-4 px-4 rounded-md cursor-not-allowed'>
               <Image
-                src={CHAIN_CONFIG[fetchedData?.secondaryChain]?.img}
+                src={CHAIN_CONFIG[secondary]?.img}
                 height={30}
                 width={30}
                 alt='primary chain'
                 className='rounded-[50px]'
               />
-              <p className=' text-gray-300 '>
-                {CHAIN_CONFIG[fetchedData?.secondaryChain]?.name}
-              </p>
+              <p className=' text-gray-300 '>{CHAIN_CONFIG[secondary]?.name}</p>
             </div>
           </div>
         </div>
 
-        {address &&
-        chain.id !== CHAIN_CONFIG[fetchedData?.primaryChain]?.chainId ? (
+        {address && chain.id !== CHAIN_CONFIG[primary]?.chainId ? (
           <button
             onClick={() => {
               switchNetworkHandler(
-                CHAIN_CONFIG[fetchedData?.primaryChain]?.networkId,
+                CHAIN_CONFIG[primary]?.networkId,
                 setLoading
               );
             }}
@@ -155,7 +152,7 @@ const Modal = ({
             {loading ? (
               <Loader inComp={true} />
             ) : (
-              `Switch to ${CHAIN_CONFIG[fetchedData?.primaryChain]?.name} `
+              `Switch to ${CHAIN_CONFIG[primary]?.name} `
             )}
           </button>
         ) : address ? (
@@ -167,7 +164,7 @@ const Modal = ({
             {loading ? (
               <Loader inComp={true} />
             ) : !isEnoughBalance ? (
-              'Insufficient Balance'
+              `Insufficient ${tokenName} balance`
             ) : (
               'Transfer'
             )}

@@ -1,6 +1,5 @@
 'use client';
 
-import { Inter } from 'next/font/google';
 import { useEffect, useState } from 'react';
 import { useAccount, useNetwork } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
@@ -11,7 +10,7 @@ import {
 import { ABI, CHAINS, CHAIN_CONFIG } from '@/utils/constants';
 import { parseEther, parseUnits } from 'viem';
 import Modal from '@/components/Modal';
-import { formatEther } from 'ethers';
+import { useRouter } from 'next/router';
 
 const Home = () => {
   const [fetchedData, setFetchedData] = useState({});
@@ -21,6 +20,10 @@ const Home = () => {
   const { address } = useAccount();
   const { chain } = useNetwork();
   const { open } = useWeb3Modal();
+
+  const router = useRouter();
+
+  const { token, amount, primary, secondary, receiver } = router.query;
 
   const connectWalletHandler = async () => {
     setLoading(true);
@@ -40,11 +43,11 @@ const Home = () => {
       const decimal = await readContractFunction({
         abi: ABI,
         account: address,
-        address: fetchedData.tokenAddress,
+        address: token,
         args: [],
         chainId: chain.id,
         functionName: 'decimals',
-        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain].rpcUrl,
+        rpcUrl: CHAIN_CONFIG[primary]?.rpcUrl,
       });
 
       setDecimals(decimal);
@@ -59,17 +62,12 @@ const Home = () => {
       const res = await writeContractFunction({
         abi: ABI,
         account: address,
-        address: fetchedData?.tokenAddress,
-        args: [
-          fetchedData.secondaryChain,
-          fetchedData.recieverAddress,
-          Number(parseUnits(fetchedData.amount, decimals)),
-          '0x',
-        ],
-        chainId: CHAINS[fetchedData.primaryChain],
+        address: token,
+        args: [secondary, receiver, Number(parseUnits(amount, decimals)), '0x'],
+        chainId: CHAINS[primary],
         functionName: 'interchainTransfer',
-        rpcUrl: CHAIN_CONFIG[fetchedData?.primaryChain]?.rpcUrl,
-        value: parseEther(CHAIN_CONFIG[fetchedData?.primaryChain]?.value),
+        rpcUrl: CHAIN_CONFIG[primary]?.rpcUrl,
+        value: parseEther(CHAIN_CONFIG[primary]?.value),
       });
       setLoading(false);
     } catch (error) {
@@ -79,9 +77,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchData();
-    fetchDecimals();
-  }, [fetchedData?.primaryChain, address]);
+    if (token && address) {
+      fetchDecimals();
+      fetchData();
+    }
+  }, [primary, address, token]);
 
   return (
     <main className='flex flex-col items-center min-h-screen pt-32 bg-[url("/bg.png")] font-Avenir '>

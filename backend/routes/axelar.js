@@ -14,7 +14,14 @@ router.get('/health', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
+  res
+    .status(200)
+    .setHeader('Content-Type', 'text/html')
+    .send(RESPONSE_TYPE.ZERO_PAGE);
+});
+
+router.get('/start', async (req, res) => {
   res
     .status(200)
     .setHeader('Content-Type', 'text/html')
@@ -155,11 +162,15 @@ router.post('/reciever', async (req, res) => {
     }
 
     dataObj.recieverAddress = req.body.untrustedData.inputText;
+    const SUCCESS = RESPONSE_TYPE.SUCCESS({
+      amount: dataObj.amount,
+      primaryChain: dataObj.primaryChain,
+      receiverAddress: req.body.untrustedData.inputText,
+      secondaryChain: dataObj.secondaryChain,
+      tokenAddress: dataObj.tokenAddress,
+    });
 
-    res
-      .status(200)
-      .setHeader('Content-Type', 'text/html')
-      .send(RESPONSE_TYPE.SUCCESS);
+    res.status(200).setHeader('Content-Type', 'text/html').send(SUCCESS);
   } catch (error) {
     console.log(error);
     return res
@@ -169,11 +180,6 @@ router.post('/reciever', async (req, res) => {
   }
 });
 
-// router.get('/confirm', async (req, res) => {
-//   const queryParams = new URLSearchParams(dataObj).toString();
-//   const redirectUrl = `http://localhost:3000/${queryParams}`;
-//   res.redirect(redirectUrl);
-// });
 
 router.get('/confirm', async (req, res) => {
   res.json(dataObj);
