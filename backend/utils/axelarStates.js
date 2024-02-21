@@ -11,10 +11,6 @@ const ZERO_PAGE = `
       property="og:image"
       content="https://i.imgur.com/xDdBoI3.png"
     />
-    <meta
-    property="fc:frame:input:text"
-    content="Enter token address"
-    />
     <meta property="fc:frame" content="vNext" />
     <meta
       property="fc:frame:image"
